@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 10,
     height: 120,
-    backgroundColor: "#F5F1DC",
+    // backgroundColor: "#F5F1DC",
   },
   title: {
     fontSize: 20,

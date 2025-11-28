@@ -7,7 +7,6 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
 import React, { useRef, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   ScrollView,
   StyleSheet,
@@ -16,8 +15,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Toast from "react-native-toast-message";
 import { signIn } from "../buoi12/database";
+import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type NavigationProps = NativeStackNavigationProp<AuthStackParamList, "SignIn">;
 
@@ -31,6 +31,7 @@ const SignIn = () => {
   const passwordRef = useRef<TextInput>(null);
   const handleSignIn = async () => {
     const result = await signIn({ email: email, password: password });
+    console.log("Test login result: ", result);
     if (result.status) {
       Toast.show({
         type: "success",

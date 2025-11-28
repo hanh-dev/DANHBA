@@ -31,7 +31,6 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
       />
       <Text style={styles.productName}>{product.name}</Text>
       <Text style={styles.productPrice}>{product.price}đ</Text>
-      {/* Xem cac san pham khac */}
       <CategorySelector id={product.categoryId}/>
     </View>
   );

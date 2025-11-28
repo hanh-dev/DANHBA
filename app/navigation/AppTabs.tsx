@@ -4,8 +4,8 @@ import React from "react";
 import HomeStack from "./HomeStack";
 import ProfileStack from "./ProfileStack";
 import { BottomTabParamList } from "./types";
+import CategoryStack from "./CategoryStack";
 
-const CategoriesStack = HomeStack;
 const OrdersStack = HomeStack;
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -72,7 +72,7 @@ const AppTabs = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Categories" component={CategoriesStack} />
+      <Tab.Screen name="Categories" component={CategoryStack} />
       <Tab.Screen name="Orders" component={OrdersStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>

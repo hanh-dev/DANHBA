@@ -1,6 +1,6 @@
 import FinalProduct from "@/components/buoi12/FinalProduct";
-import ProductDetail from "@/components/buoi13/ProductDetail";
 import ProductsByCategory from "@/components/buoi14/ProductsByCategory";
+import ProductDetail from "@/components/Last/ProductDetail";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { StyleSheet } from "react-native";
