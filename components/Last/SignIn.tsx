@@ -4,6 +4,7 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -15,9 +16,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { signIn } from "../buoi12/database";
 import Toast from "react-native-toast-message";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signIn } from "../buoi12/database";
 
 type NavigationProps = NativeStackNavigationProp<AuthStackParamList, "SignIn">;
 
@@ -39,7 +39,10 @@ const SignIn = () => {
         text2: "Sign in successful! 🎉",
       });
       navigation.navigate("Main");
-      await AsyncStorage.setItem("userToken", JSON.stringify(result.data?.id));
+      await AsyncStorage.multiSet([
+        ["userName", result.data?.name || ""],
+        ["userToken", JSON.stringify(result.data?.id)],
+      ]);
     } else {
       if (result.message === "Email is incorrect!") {
         emailRef.current?.focus();

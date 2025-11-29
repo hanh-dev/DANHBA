@@ -1,4 +1,3 @@
-// ProductCard.tsx
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -100,8 +99,8 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#658C58",
+    fontWeight: "700",
+    color: "red",
     marginVertical: 8,
   },
   nameText: {
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#658C58",
+    backgroundColor: "#4CAF50",
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 15,

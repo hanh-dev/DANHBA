@@ -9,6 +9,7 @@ export type HomeStackParamList = {
     categories?: Category[];
   };
   CategorySelector: undefined;
+  Filter: undefined;
 };
 
 export type ProfileStackParamList = {

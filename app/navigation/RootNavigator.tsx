@@ -3,7 +3,7 @@ import SignUp from "@/components/Last/SignUp";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native"; // 👈 Thêm View, ActivityIndicator
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import AppTabs from "./AppTabs";
 
 const AppTabsWrapper = () => (
@@ -21,7 +21,7 @@ export type AuthStackParamList = {
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 const RootNavigator = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [userToken, setUserToken] = useState<string | null>(null);
 
   useEffect(() => {

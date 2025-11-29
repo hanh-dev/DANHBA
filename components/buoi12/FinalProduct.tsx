@@ -1,18 +1,9 @@
 import { HomeStackParamList } from "@/app/navigation/types";
-import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import BannerCarousel from "../Last/BannerCarousel";
 import CategoryList, { CategoryUI } from "../Last/CategoryList";
 import Header from "../Last/Header";
 import ProductCard from "../Last/ProductCard";
@@ -59,22 +50,31 @@ type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 const FinalProduct = ({ navigation }: HomeScreenProps) => {
   const [categories, setCategories] = useState<CategoryUI[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [keyword, setKeyword] = useState<string>("");
 
   const fetchData = async () => {
     try {
       const rawCategories: Category[] = await getAllCategories();
-      console.log("Tesst categories: ", rawCategories);
-
       const uiCategories = mapCategoryToUI(rawCategories);
-
       setCategories(uiCategories);
-
-      // Product List
       const rawProducts: Product[] = await getAllProducts();
-      console.log("Test product list: ", rawProducts);
       setProducts(rawProducts);
     } catch (error) {
       console.error("Error fetching product list: ", error);
+    }
+  };
+
+  const handleSearch = async (text: string) => {
+    console.log("Searching for: ", text);
+    if (text.trim() !== "") {
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) =>
+          product.name.toLowerCase().includes(text.toLowerCase())
+        )
+      );
+    } else {
+      const rawProducts: Product[] = await getAllProducts();
+      setProducts(rawProducts);
     }
   };
 
@@ -85,20 +85,17 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Header />
-
-        {/* Search */}
-        <View style={styles.searchWrapp}>
-          <TextInput
-            style={styles.input}
-            placeholder="Search here anything you want..."
-          />
-          <Ionicons style={styles.searchIcon} name="search-outline" size={18} />
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <Header
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleSearch={handleSearch}
+        />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, paddingHorizontal: 10 }}
+        >
           {/* Carousel */}
-          <BannerCarousel />
+          {/* <BannerCarousel /> */}
 
           {/* Category List */}
           <CategoryList categories={categories} />
@@ -130,13 +127,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#E8F9FF",
-    paddingTop: 40,
+  },
+  boxSearch: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    gap: 10,
     paddingHorizontal: 10,
   },
   searchWrapp: {
+    flex: 1,
     position: "relative",
     justifyContent: "center",
-    marginTop: 15,
   },
   searchIcon: {
     position: "absolute",
@@ -163,6 +166,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#658C58",
-    marginLeft: 10
+    marginLeft: 10,
   },
 });

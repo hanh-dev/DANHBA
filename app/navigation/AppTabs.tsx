@@ -1,10 +1,11 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import React from "react";
+import CategoryStack from "./CategoryStack";
 import HomeStack from "./HomeStack";
 import ProfileStack from "./ProfileStack";
 import { BottomTabParamList } from "./types";
-import CategoryStack from "./CategoryStack";
 
 const OrdersStack = HomeStack;
 
@@ -71,8 +72,61 @@ const AppTabs = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Categories" component={CategoryStack} />
+      <Tab.Screen
+        name="Home"
+        component={HomeStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (
+            routeName === "ProductDetail" ||
+            routeName === "ProductsByCategory" ||
+            routeName === "Filter"
+          ) {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
+      <Tab.Screen
+        name="Categories"
+        component={CategoryStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (
+            routeName === "ProductDetail" ||
+            routeName === "ProductByCategory"
+          ) {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
       <Tab.Screen name="Orders" component={OrdersStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>

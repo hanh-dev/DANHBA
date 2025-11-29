@@ -1,6 +1,7 @@
 import { ProductByCategoryParamList } from "@/app/navigation/types";
 import ProductByCategory from "@/components/Last/ProductByCategory";
-import ProductDetail from "@/components/buoi13/ProductDetail";
+
+import ProductDetail from "@/components/Last/ProductDetail";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { StyleSheet } from "react-native";

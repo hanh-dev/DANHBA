@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { HomeStackParamList } from "../../app/navigation/types";
 import { Category, getAllCategories } from "../buoi12/database";
 import { CategoryUI } from "./CategoryList";
@@ -47,7 +48,20 @@ const mapCategoryToUI = (categories: Category[]): CategoryUI[] => {
 const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
   const { product } = route.params;
   const [categories, setCategories] = useState<CategoryUI[]>([]);
+  const [isWishListed, setIsWishListed] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
+
+  const handleAdddToWishList = () => {
+    setIsWishListed(!isWishListed);
+    if (isWishListed === false) {
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Add to wishlist successfully! 🎉",
+      });
+    }
+    console.log("Add to wishlist", product.id);
+  };
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -66,10 +80,10 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
         <Ionicons
           name="chevron-back"
           size={24}
-          color="#333"
+          color="#4CAF50"
           onPress={() => navigation.goBack()}
         />
-        <Ionicons name="cart-outline" size={24} color="#333" />
+        <Ionicons name="cart-outline" size={24} color="#4CAF50" />
       </View>
 
       {/* Product Image */}
@@ -88,7 +102,7 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
       <View style={styles.rowBetween}>
         <View>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.productOrigin}>Deshi Product</Text>
+          <Text style={styles.productOrigin}>{product.categoryId}</Text>
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={16} color="#FBC02D" />
             <Ionicons name="star" size={16} color="#FBC02D" />
@@ -98,7 +112,12 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
           </View>
         </View>
 
-        <Ionicons name="heart-outline" size={30} color="#999" />
+        <Ionicons
+          name={isWishListed ? "heart" : "heart-outline"}
+          size={30}
+          color="red"
+          onPress={handleAdddToWishList}
+        />
       </View>
 
       {/* Quantity + Price */}
@@ -138,7 +157,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
+    paddingBottom: 20,
   },
 
   topBar: {
@@ -176,7 +196,7 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#2C2C2C",
+    color: "#4CAF50",
   },
 
   productOrigin: {
@@ -191,9 +211,9 @@ const styles = StyleSheet.create({
 
   quantityBox: {
     flexDirection: "row",
-    backgroundColor: "#F0F0F0",
-    borderRadius: 30,
-    paddingHorizontal: 15,
+    backgroundColor: "#4CAF50",
+    borderRadius: 35,
+    paddingHorizontal: 20,
     paddingVertical: 8,
     alignItems: "center",
     gap: 15,
@@ -202,19 +222,19 @@ const styles = StyleSheet.create({
   qtyBtn: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#555",
+    color: "#fff",
   },
 
   qtyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#333",
+    color: "#fff",
   },
 
   priceText: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "700",
-    color: "#333",
+    color: "red",
   },
 
   sectionTitle: {
@@ -222,7 +242,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 18,
     fontWeight: "600",
-    color: "#333",
+    color: "#658C58",
+    fontStyle: "italic",
   },
 
   descriptionText: {
