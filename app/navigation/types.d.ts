@@ -12,6 +12,13 @@ export type HomeStackParamList = {
   Filter: undefined;
 };
 
+export type HomeAdminStackParamList = {
+  Home: undefined;
+  UserManagement: undefined;
+  CategoryManagement: undefined;
+  ProductManagement: undefined;
+};
+
 export type ProfileStackParamList = {
   BMI: undefined;
   ProductDetail: { product: Product };
@@ -23,6 +30,13 @@ export type BottomTabParamList = {
   Categories: undefined;
   Orders: undefined;
   Profile: undefined;
+};
+
+export type AdminTabParamList = {
+  Home: undefined;
+  Users: undefined;
+  Categories: undefined;
+  Products: undefined;
 };
 
 export type ProductDetailParamList = {

@@ -57,16 +57,16 @@ export type Product = {
 
 const usersData: User[] = [
   {
-    id: 1,
+    id: 3,
     name: "Hanh Hio",
-    email: "hanhho@gmail.com",
+    email: "hanhadmin@gmail.com",
     password: "hanh123",
     role: "admin",
   },
   {
-    id: 2,
+    id: 4,
     name: "Hanh Nguyen",
-    email: "hanhbot@gmail.com",
+    email: "hanhbot12@gmail.com",
     password: "hanh123",
     role: "buyer",
   },
@@ -318,5 +318,21 @@ export const deleteProduct = async (id: number) => {
   const databas = await dbConnection();
   await databas.runAsync("DELETE FROM products where id = ?", [id]);
 };
+
+export const getAllUsers = async (): Promise<User[]> => {
+  const database = await dbConnection();
+  const results = await database.getAllAsync("SELECT * FROM users");
+  let users: User[] = [];
+  for (const row of results as any[]) {
+    users.push({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      password: row.password,
+      role: row.role,
+    });
+  }
+  return users;
+}
 
 export default dbConnection;

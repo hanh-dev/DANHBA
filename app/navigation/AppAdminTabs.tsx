@@ -1,0 +1,137 @@
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import React from "react";
+import CategoryStack from "./CategoryStack";
+import HomeStack from "./HomeStack";
+import ProfileStack from "./ProfileStack";
+import { AdminTabParamList } from "./types";
+import HomeAdminStack from "./HomeAdminStack";
+import UserManagement from "@/components/Last/admin/UserManagement";
+import CategoryManagement from "@/components/Last/admin/CategoryManagement";
+import ProductManagement from "@/components/Last/admin/ProductManagement";
+
+const Tab = createBottomTabNavigator<AdminTabParamList>();
+
+const AppAdminTabs = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "#F0E491",
+        tabBarInactiveTintColor: "#BBC863",
+        tabBarStyle: {
+          backgroundColor: "#007E6E",
+          height: 65,
+          paddingTop: 8,
+          borderTopWidth: 0,
+          borderRadius: 50,
+          marginBottom: 0,
+        },
+
+        tabBarIcon: ({ color, size, focused }) => {
+          switch (route.name) {
+            case "Home":
+              return (
+                <Ionicons
+                  name={focused ? "home" : "home-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
+
+            case "Users":
+              return (
+                <Ionicons
+                  name={focused ? "people" : "people-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
+            case "Categories":
+              return (
+                <MaterialCommunityIcons
+                  name={focused ? "view-grid" : "view-grid-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
+
+            case "Products":
+              return (
+                <Ionicons
+                  name={focused ? "cube" : "cube-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
+
+            default:
+              return null;
+          }
+        },
+      })}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeAdminStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (
+            routeName === "UserManagement" ||
+            routeName === "ProductsByCategory" ||
+            routeName === "Filter"
+          ) {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
+      <Tab.Screen name="Users" component={UserManagement} />
+      <Tab.Screen
+        name="Categories"
+        component={CategoryManagement}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (
+            routeName === "UserManagement" ||
+            routeName === "ProductByCategory"
+          ) {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
+      <Tab.Screen name="Products" component={ProductManagement} />
+    </Tab.Navigator>
+  );
+};
+
+export default AppAdminTabs;

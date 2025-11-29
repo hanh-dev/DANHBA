@@ -51,7 +51,6 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
   const [categories, setCategories] = useState<CategoryUI[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [keyword, setKeyword] = useState<string>("");
-
   const fetchData = async () => {
     try {
       const rawCategories: Category[] = await getAllCategories();
@@ -64,9 +63,9 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
     }
   };
 
-  const handleSearch = async (text: string) => {
-    console.log("Searching for: ", text);
-    if (text.trim() !== "") {
+  const handleSearch = async (text?: string, price?: [number, number]) => {
+    console.log("Searching for: ", text, price);
+    if (text && text.trim() !== "") {
       setProducts((prevProducts) =>
         prevProducts.filter((product) =>
           product.name.toLowerCase().includes(text.toLowerCase())
@@ -75,6 +74,13 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
     } else {
       const rawProducts: Product[] = await getAllProducts();
       setProducts(rawProducts);
+    }
+    if (price) {
+      setProducts((prevProducts) =>
+        prevProducts.filter(
+          (product) => product.price >= price[0] && product.price <= price[1]
+        )
+      );
     }
   };
 

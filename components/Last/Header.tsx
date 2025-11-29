@@ -1,9 +1,7 @@
-import { HomeStackParamList } from "@/app/navigation/types";
 import { Ionicons } from "@expo/vector-icons";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useNavigation } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -12,35 +10,41 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import PriceFilter from "./PriceFilter";
 
 interface HeaderProps {
   keyword: string;
   setKeyword: React.Dispatch<React.SetStateAction<string>>;
-  handleSearch: (text: string) => void;
+  handleSearch: (text: string, priceRange?: [number, number]) => void;
 }
-
-type NavigationProps = NativeStackNavigationProp<HomeStackParamList, "Home">;
 
 const Header: React.FC<HeaderProps> = ({
   keyword,
   setKeyword,
   handleSearch,
 }) => {
-  const [userName, setUserName] = React.useState<string | null>(null);
-  const navigation = useNavigation<NavigationProps>();
+  const [userName, setUserName] = useState<string | null>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [status, setStatus] = useState(false);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(50);
+
   useEffect(() => {
     const fetchUserName = async () => {
-      try {
-        const name = await AsyncStorage.getItem("userName");
-        setUserName(name);
-      } catch (error) {
-        console.error("Error fetching user name:", error);
-      }
+      const name = await AsyncStorage.getItem("userName");
+      setUserName(name);
     };
     fetchUserName();
   }, []);
+
+  const openFilter = () => {
+    setStatus(!status);
+    bottomSheetRef.current?.present();
+  };
+
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.leftHeader}>
           <View style={styles.imageWrapper}>
@@ -56,6 +60,8 @@ const Header: React.FC<HeaderProps> = ({
           <Ionicons name="notifications-outline" size={19} color="#ffffff" />
         </View>
       </View>
+
+      {/* Search Bar */}
       <View style={styles.boxSearch}>
         <View style={styles.searchWrapp}>
           <TextInput
@@ -69,10 +75,25 @@ const Header: React.FC<HeaderProps> = ({
           />
           <Ionicons style={styles.searchIcon} name="search-outline" size={20} />
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate("Filter")}>
+
+        <TouchableOpacity onPress={openFilter}>
           <Ionicons name="options-outline" size={28} color="#ffffff" />
         </TouchableOpacity>
       </View>
+
+      {/* BottomSheet Filter */}
+      {status && (
+        <PriceFilter
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onApply={(range) => {
+            setMinPrice(range[0]);
+            setMaxPrice(range[1]);
+            handleSearch(keyword, range);
+            setStatus(false);
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -97,7 +118,6 @@ const styles = StyleSheet.create({
   leftHeader: {
     flexDirection: "row",
     gap: 8,
-    justifyContent: "center",
     alignItems: "center",
   },
   imageWrapper: {
@@ -109,45 +129,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  image: {
-    width: 32,
-    height: 32,
-    borderRadius: 50,
-    resizeMode: "cover",
-    marginTop: 0.5,
-  },
-  textAddress: {
-    color: "#ffffff",
-  },
-  rightHeader: {
-    flexDirection: "row",
-    gap: 4,
-  },
+  image: { width: 32, height: 32, borderRadius: 50 },
+  textAddress: { color: "#ffffff" },
+  rightHeader: { flexDirection: "row", gap: 4 },
   boxSearch: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10,
     gap: 10,
+    alignItems: "center",
     paddingHorizontal: 10,
+    marginTop: 10,
   },
-  searchWrapp: {
-    flex: 1,
-    position: "relative",
-    justifyContent: "center",
-  },
+  searchWrapp: { flex: 1, position: "relative" },
   input: {
     backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#658C58",
     borderRadius: 10,
     padding: 10,
-    marginVertical: 6,
     paddingRight: 40,
   },
-  searchIcon: {
-    position: "absolute",
-    right: 10,
-    color: "#ffffff",
+  searchIcon: { position: "absolute", right: 10, color: "#ffffff" },
+  applyButton: {
+    marginTop: 20,
+    backgroundColor: "#4CAF50",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
   },
 });

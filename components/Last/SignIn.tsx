@@ -7,7 +7,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -17,7 +17,7 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { signIn } from "../buoi12/database";
+import { getAllUsers, initUsers, signIn } from "../buoi12/database";
 
 type NavigationProps = NativeStackNavigationProp<AuthStackParamList, "SignIn">;
 
@@ -41,6 +41,7 @@ const SignIn = () => {
       navigation.navigate("Main");
       await AsyncStorage.multiSet([
         ["userName", result.data?.name || ""],
+        ["role", result.data?.role || ""],
         ["userToken", JSON.stringify(result.data?.id)],
       ]);
     } else {
