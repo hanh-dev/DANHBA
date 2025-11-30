@@ -10,6 +10,8 @@ export type HomeStackParamList = {
   };
   CategorySelector: undefined;
   Filter: undefined;
+  Checkout: undefined;
+  Cart: undefined;
 };
 
 export type HomeAdminStackParamList = {
@@ -49,6 +51,13 @@ export type ProductByCategoryParamList = {
   ProductByCategory: {id: number},
   ProductDetail: {product: Product}
 }
+
+export type AuthStackParamList = {
+  SignIn: undefined;
+  SignUp: undefined;
+  Main: undefined;
+  Admin: undefined;
+};
 
 export const PRODUCT_IMAGES: { [key: string]: any } = {
   vegetable: require("../../assets/grocery/vegetable.png"),

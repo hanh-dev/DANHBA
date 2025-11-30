@@ -6,6 +6,8 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { HomeStackParamList } from "./types";
 import Filter from "@/components/Last/Filter";
+import Checkout from "@/components/Last/Checkout";
+import Cart from "@/components/Last/Cart";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -16,6 +18,8 @@ const HomeStack = () => {
       <Stack.Screen name="ProductDetail" component={ProductDetail} />
       <Stack.Screen name="ProductsByCategory" component={ProductsByCategory} />
       <Stack.Screen name="Filter" component={Filter} />
+      <Stack.Screen name="Checkout" component={Checkout} />
+      <Stack.Screen name="Cart" component={Cart} />
     </Stack.Navigator>
   );
 };

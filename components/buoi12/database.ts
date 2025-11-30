@@ -30,6 +30,29 @@ const dbConnection = async (): Promise<SQLite.SQLiteDatabase> => {
     FOREIGN KEY (categoryId) REFERENCES categories (id)
   )`;
   await db.execAsync(createProductsTableQuery);
+  // Orders table
+  const createOrdersTableQuery = `CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    order_date TEXT NOT NULL,
+    total_amount REAL NOT NULL,
+    status TEXT NOT NULL,
+    payment_method TEXT,
+    shipping_address TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+  )`;
+  await db.execAsync(createOrdersTableQuery);
+  // Order Items table
+  const createOrderItemsTableQuery = `CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    price REAL NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id),
+    FOREIGN KEY (product_id) REFERENCES products (id)
+  )`;
+  await db.execAsync(createOrderItemsTableQuery);
   return db;
 };
 
@@ -152,8 +175,29 @@ export const initUsers = async (): Promise<void> => {
   console.log("✅ Users initialized successfully!");
 };
 
+export const deleteUserServer = async (id: number): Promise<void> => {
+  const database = await dbConnection();
+  await database.runAsync("DELETE FROM users where id = ?", [id]);
+};
+
+type EditUserData = {
+  id: number;
+  name: string;
+  role: string;
+};
+
+export const updateUser = async (user: EditUserData): Promise<void> => {
+  const database = await dbConnection();
+  await database.runAsync("UPDATE users SET name = ?, role = ? WHERE id = ?", [
+    user.name,
+    user.role,
+    user.id,
+  ]);
+};
+
 export const initCategories = async (): Promise<void> => {
   const database = await dbConnection();
+  await database.execAsync("ALTER TABLE categories ADD COLUMN img TEXT");
 
   for (const category of categoriesData) {
     await database.execAsync(
@@ -169,17 +213,39 @@ export const initProducts = async (): Promise<void> => {
 
   for (const product of initialProducts) {
     await database.execAsync(
-      `INSERT INTO products (id, name, price, img, categoryId) VALUES ('${product.id}', '${product.name}', '${product.price}', '${product.img}', '${product.categoryId}');`
+      `INSERT INTO products (id, name, price, img, categoryId)
+       VALUES ('${product.id}', '${product.name}', '${product.price}', '${product.img}', '${product.categoryId}');`
     );
   }
 
-  console.log("✅ Products initialized (transaction)");
+  console.log("✅ Products initialized successfully!");
 };
 
 export const initSampleData = async () => {
   // await initCategories();
   // await initProducts();
   // await initUsers();
+};
+
+export const addCategory = async (category: Category) => {
+  const database = await dbConnection();
+  await database.runAsync(
+    "INSERT INTO categories (name, img) VALUES (?, ?)",
+    [category.name, category.img]
+  );
+};
+
+export const updateCategory = async (category: Category) => {
+  const database = await dbConnection();
+  await database.runAsync(
+    "UPDATE categories SET name = ?, img = ? WHERE id = ?",
+    [category.name, category.img, category.id]
+  );
+};
+
+export const deleteCategory = async (id: number) => {
+  const database = await dbConnection();
+  await database.runAsync("DELETE FROM categories where id = ?", [id]);
 };
 
 export const getAllCategories = async (): Promise<Category[]> => {
@@ -333,6 +399,6 @@ export const getAllUsers = async (): Promise<User[]> => {
     });
   }
   return users;
-}
+};
 
 export default dbConnection;

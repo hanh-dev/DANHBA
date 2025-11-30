@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Product } from "../buoi12/database";
@@ -8,29 +9,33 @@ interface ProductCardProps {
   onPress: () => void;
 }
 
-export const PRODUCT_IMAGES: {[key: string]: any} = {
-    'broccoli': require('../../assets/grocery/eggplant.png'),
-    'capsicum': require('../../assets/grocery/capsicum.png'),
-    'tomato': require('../../assets/grocery/tamato.png'),
-    'pumkin': require('../../assets/grocery/pumkin.png'),
-    'lemon': require('../../assets/grocery/peach.png'),
-    'banana': require('../../assets/grocery/aocado.png'),
-    'orange': require('../../assets/grocery/orange.png'),
-    'blueberry': require('../../assets/grocery/pomegranate.png'),
-    'blackpepper': require('../../assets/grocery/banana1.png'),
-    'chilipowder': require('../../assets/grocery/tomatto.png'),
-    'turmeric': require('../../assets/grocery/potato.png'),
-    'cinnamon': require('../../assets/grocery/pineapple.png'),
-    'egg': require('../../assets/grocery/egg.png'),
-    'rice': require('../../assets/grocery/cabbage.png'),
-    'chicken': require('../../assets/grocery/chicken.png'),
-    'flour': require('../../assets/grocery/mango.png'),
-    'friedchicken': require('../../assets/grocery/grapes.png'),
-    'springroll': require('../../assets/grocery/sideDishes.png'),
-    'salad': require('../../assets/grocery/vegetable.png'),
-}
+export const PRODUCT_IMAGES: { [key: string]: any } = {
+  broccoli: require("../../assets/grocery/eggplant.png"),
+  capsicum: require("../../assets/grocery/capsicum.png"),
+  tomato: require("../../assets/grocery/tamato.png"),
+  pumkin: require("../../assets/grocery/pumkin.png"),
+  lemon: require("../../assets/grocery/peach.png"),
+  banana: require("../../assets/grocery/aocado.png"),
+  orange: require("../../assets/grocery/orange.png"),
+  blueberry: require("../../assets/grocery/pomegranate.png"),
+  blackpepper: require("../../assets/grocery/banana1.png"),
+  chilipowder: require("../../assets/grocery/tomatto.png"),
+  turmeric: require("../../assets/grocery/potato.png"),
+  cinnamon: require("../../assets/grocery/pineapple.png"),
+  egg: require("../../assets/grocery/egg.png"),
+  rice: require("../../assets/grocery/cabbage.png"),
+  chicken: require("../../assets/grocery/chicken.png"),
+  flour: require("../../assets/grocery/mango.png"),
+  friedchicken: require("../../assets/grocery/grapes.png"),
+  springroll: require("../../assets/grocery/sideDishes.png"),
+  salad: require("../../assets/grocery/vegetable.png"),
+};
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
+  const navigation: any = useNavigation();
+  const handleBuy = () => {
+    console.log(`Buying product: ${product.name}`);
+  };
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <TouchableOpacity style={styles.favIcon}>
@@ -40,7 +45,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
       <View style={styles.imageContainer}>
         <View style={styles.imageBackground} />
         <Image
-          source={PRODUCT_IMAGES[product.img]}
+          source={
+            product.img.startsWith("file://")
+              ? { uri: product.img }
+              : PRODUCT_IMAGES[product.img]
+          }
           style={styles.productImage}
           resizeMode="contain"
         />
@@ -50,9 +59,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
 
       <Text style={styles.nameText}>{product.name}</Text>
 
-      <TouchableOpacity style={styles.cartButton}>
+      <TouchableOpacity
+        style={styles.cartButton}
+        onPress={() => navigation.navigate("Checkout")}
+      >
         <Ionicons name="bag-add-outline" size={20} color="#fff" />
-        <Text style={styles.cartButtonText}>Add to cart</Text>
+        <Text style={styles.cartButtonText}>Buy</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -108,7 +120,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "#1A5319",
-    marginBottom: 5
+    marginBottom: 5,
   },
   unitText: {
     fontSize: 12,

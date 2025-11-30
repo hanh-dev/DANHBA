@@ -12,7 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProductByCategoryParamList } from "@/app/navigation/types";
 import { useNavigation } from "expo-router";
 
-const PRODUCT_IMAGES: { [key: string]: any } = {
+export const PRODUCT_IMAGES: { [key: string]: any } = {
   vegetable: require("../../assets/grocery/vegetable.png"),
   fruit: require("../../assets/grocery/fruit2.png"),
   spice: require("../../assets/grocery/spice2.png"),

@@ -2,15 +2,32 @@ import SignIn from "@/components/Last/SignIn";
 import SignUp from "@/components/Last/SignUp";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import React, { createContext, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import AppAdminTabs from "./AppAdminTabs";
 import AppTabs from "./AppTabs";
+import AuthStack from "./AuthStack";
+// --- Context để quản lý auth ---
+interface AuthContextType {
+  userToken: string | null;
+  role: string | null;
+  login: (token: string, role: string) => void;
+  logout: () => void;
+}
+export const AuthContext = createContext<AuthContextType>({
+  userToken: null,
+  role: null,
+  login: () => {},
+  logout: () => {},
+});
 
 const AppTabsWrapper = () => (
-  <View style={{ flex: 1, backgroundColor: "#E8F9FF" }}>
-    <AppTabs />
-  </View>
+  <StripeProvider publishableKey="pk_test_51Q56IALiAnjHSuM167o2rtbfUD6eJxGZ7mTfEmjGx9VLBLL0Dh3HSaGxq8DgHLyNtNHLPDz0hmW0hKbrbGwDuYIA00vb6Dj5tk">
+    <View style={{ flex: 1, backgroundColor: "#E8F9FF" }}>
+      <AppTabs />
+    </View>
+  </StripeProvider>
 );
 
 export type AuthStackParamList = {
@@ -23,26 +40,39 @@ export type AuthStackParamList = {
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 const RootNavigator = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      let token: string | null = null;
-      let role: string | null = null;
-      try {
-        token = await AsyncStorage.getItem("userToken");
-        role = await AsyncStorage.getItem("role");
-        console.log("Bootstrap role:", role);
-      } catch (error) {
-        console.error("Error fetching token:", error);
-        token = null;
-        role = null;
-      }
+  const authContext: AuthContextType = {
+    userToken,
+    role,
+    login: async (token: string, role: string) => {
+      await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("role", role);
       setUserToken(token);
       setRole(role);
-      setIsLoading(false);
+    },
+    logout: async () => {
+      await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("role");
+      setUserToken(null);
+      setRole(null);
+    },
+  };
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        const storedRole = await AsyncStorage.getItem("role");
+        setUserToken(token);
+        setRole(storedRole);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     bootstrapAsync();
   }, []);
@@ -56,18 +86,22 @@ const RootNavigator = () => {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!userToken ? (
-        <>
+    <AuthContext.Provider value={authContext}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!userToken ? (
+          <>
+            <Stack.Screen name="SignIn" component={AuthStack} />
+            <Stack.Screen name="SignUp" component={SignUp} />
+          </>
+        ) : role === "buyer" ? (
+          <Stack.Screen name="Main" component={AppTabsWrapper} />
+        ) : role === "admin" ? (
+          <Stack.Screen name="Admin" component={AppAdminTabs} />
+        ) : (
           <Stack.Screen name="SignIn" component={SignIn} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-        </>
-      ) : role === "buyer" ? (
-        <Stack.Screen name="Main" component={AppTabsWrapper} />
-      ) : (
-        <Stack.Screen name="Admin" component={AppAdminTabs} />
-      )}
-    </Stack.Navigator>
+        )}
+      </Stack.Navigator>
+    </AuthContext.Provider>
   );
 };
 

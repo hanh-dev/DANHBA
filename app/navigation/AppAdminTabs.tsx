@@ -1,15 +1,12 @@
+import ProductManagement from "@/components/Last/admin/ProductManagement";
+import UserManagement from "@/components/Last/admin/UserManagement";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import React from "react";
-import CategoryStack from "./CategoryStack";
-import HomeStack from "./HomeStack";
-import ProfileStack from "./ProfileStack";
-import { AdminTabParamList } from "./types";
+import CategoryAdminStack from "./CategoryAdminStack";
 import HomeAdminStack from "./HomeAdminStack";
-import UserManagement from "@/components/Last/admin/UserManagement";
-import CategoryManagement from "@/components/Last/admin/CategoryManagement";
-import ProductManagement from "@/components/Last/admin/ProductManagement";
+import { AdminTabParamList } from "./types";
 
 const Tab = createBottomTabNavigator<AdminTabParamList>();
 
@@ -82,6 +79,8 @@ const AppAdminTabs = () => {
           if (
             routeName === "UserManagement" ||
             routeName === "ProductsByCategory" ||
+            routeName === "ProductManagement" ||
+            routeName === "CategoryManagement" ||
             routeName === "Filter"
           ) {
             return {
@@ -101,17 +100,13 @@ const AppAdminTabs = () => {
           };
         }}
       />
-      <Tab.Screen name="Users" component={UserManagement} />
       <Tab.Screen
-        name="Categories"
-        component={CategoryManagement}
+        name="Users"
+        component={UserManagement}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
 
-          if (
-            routeName === "UserManagement" ||
-            routeName === "ProductByCategory"
-          ) {
+          if (routeName === "Users" || routeName === "ProductByCategory") {
             return {
               tabBarStyle: { display: "none" },
             };
@@ -129,7 +124,54 @@ const AppAdminTabs = () => {
           };
         }}
       />
-      <Tab.Screen name="Products" component={ProductManagement} />
+      <Tab.Screen
+        name="Categories"
+        component={CategoryAdminStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (routeName === "Categories" || routeName === "ProductByCategory") {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
+      <Tab.Screen
+        name="Products"
+        component={ProductManagement}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+          if (routeName === "Products" || routeName === "ProductsByCategory") {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
     </Tab.Navigator>
   );
 };
