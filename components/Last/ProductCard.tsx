@@ -61,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
 
       <TouchableOpacity
         style={styles.cartButton}
-        onPress={() => navigation.navigate("Checkout")}
+        onPress={() => navigation.navigate("Checkout", { product })}
       >
         <Ionicons name="bag-add-outline" size={20} color="#fff" />
         <Text style={styles.cartButtonText}>Buy</Text>

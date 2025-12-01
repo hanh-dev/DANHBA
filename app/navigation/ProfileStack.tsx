@@ -4,6 +4,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { ProfileStackParamList } from "./types";
 import Profile from "@/components/Last/Profile";
+import EditProfile from "@/components/Last/EditProfile";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -11,6 +12,7 @@ const ProfileStack = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
       {/* <Stack.Screen name="ProductDetail" component={ProductDetail} /> */}
     </Stack.Navigator>
   );

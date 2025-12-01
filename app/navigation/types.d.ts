@@ -25,6 +25,7 @@ export type ProfileStackParamList = {
   BMI: undefined;
   ProductDetail: { product: Product };
   Profile: undefined
+  EditProfile: undefined;
 };
 
 export type BottomTabParamList = {

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
@@ -31,28 +32,17 @@ const dbConnection = async (): Promise<SQLite.SQLiteDatabase> => {
   )`;
   await db.execAsync(createProductsTableQuery);
   // Orders table
-  const createOrdersTableQuery = `CREATE TABLE IF NOT EXISTS orders (
+  const createOrdersTableQuery = `CREATE TABLE IF NOT EXISTS orders_1 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
     order_date TEXT NOT NULL,
     total_amount REAL NOT NULL,
     status TEXT NOT NULL,
-    payment_method TEXT,
-    shipping_address TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id)
-  )`;
-  await db.execAsync(createOrdersTableQuery);
-  // Order Items table
-  const createOrderItemsTableQuery = `CREATE TABLE IF NOT EXISTS order_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
-    price REAL NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders (id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (product_id) REFERENCES products (id)
   )`;
-  await db.execAsync(createOrderItemsTableQuery);
+  await db.execAsync(createOrdersTableQuery);
   return db;
 };
 
@@ -195,6 +185,22 @@ export const updateUser = async (user: EditUserData): Promise<void> => {
   ]);
 };
 
+export const getUserById = async (id: number): Promise<User | null> => {
+  const database = await dbConnection();
+  const results = await database.getAllAsync("SELECT * FROM users WHERE id = ?", [id]);
+  if (results.length > 0) {
+    const row = results[0] as any;
+    return {
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      password: row.password,
+      role: row.role,
+    };
+  }
+  return null;
+};
+
 export const initCategories = async (): Promise<void> => {
   const database = await dbConnection();
   await database.execAsync("ALTER TABLE categories ADD COLUMN img TEXT");
@@ -229,10 +235,10 @@ export const initSampleData = async () => {
 
 export const addCategory = async (category: Category) => {
   const database = await dbConnection();
-  await database.runAsync(
-    "INSERT INTO categories (name, img) VALUES (?, ?)",
-    [category.name, category.img]
-  );
+  await database.runAsync("INSERT INTO categories (name, img) VALUES (?, ?)", [
+    category.name,
+    category.img,
+  ]);
 };
 
 export const updateCategory = async (category: Category) => {
@@ -400,5 +406,65 @@ export const getAllUsers = async (): Promise<User[]> => {
   }
   return users;
 };
+
+export type Order = {
+  user_id: number;
+  status: string;
+  order_date: string;
+  total_amount: number;
+  product_id: number;
+};
+
+export const addOrder = async (order: Order) => {
+  const database = await dbConnection();
+  await database.runAsync(
+    "INSERT INTO orders_1 (user_id, product_id, order_date, total_amount, status) VALUES (?, ?, ?, ?, ?)",
+    [
+      order.user_id,
+      order.product_id,
+      order.order_date,
+      order.total_amount,
+      order.status,
+    ]
+  );
+};
+
+export const getOrdersByUserId = async (userId: number): Promise<any[]> => {
+  const database = await dbConnection();
+  const results = await database.getAllAsync(
+    "SELECT * FROM orders_1 WHERE user_id = ?",
+    [userId]
+  );
+  let orders: any[] = []; 
+  for (const row of results as any[]) {
+    orders.push({
+      id: row.id,
+      user_id: row.user_id,
+      product_id: row.product_id,
+      order_date: row.order_date,
+      total_amount: row.total_amount,
+      status: row.status,
+    });
+  }
+  return orders;
+};
+
+// getUserId
+ export const getUserId = async (): Promise<number | null> => {
+    try {
+      const userIdJson = await AsyncStorage.getItem("userId");
+
+      if (userIdJson !== null) {
+        const userId = JSON.parse(userIdJson);
+
+        return typeof userId === "number" ? userId : null;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Lỗi khi lấy User ID từ AsyncStorage:", error);
+      return null;
+    }
+  };
 
 export default dbConnection;

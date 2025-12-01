@@ -1,3 +1,4 @@
+import Orders from "@/components/Last/Orders";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -127,8 +128,34 @@ const AppTabs = () => {
           };
         }}
       />
-      <Tab.Screen name="Orders" component={OrdersStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      <Tab.Screen name="Orders" component={Orders} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "Profile";
+
+          if (
+            routeName === "Profile" ||
+            routeName === "ProductByCategory"
+          ) {
+            return {
+              tabBarStyle: { display: "none" },
+            };
+          }
+
+          return {
+            tabBarStyle: {
+              backgroundColor: "#007E6E",
+              height: 65,
+              paddingTop: 8,
+              borderTopWidth: 0,
+              borderRadius: 50,
+              marginBottom: 0,
+            },
+          };
+        }}
+      />
     </Tab.Navigator>
   );
 };

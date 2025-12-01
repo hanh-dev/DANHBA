@@ -46,6 +46,7 @@ const SignIn = () => {
       await AsyncStorage.multiSet([
         ["userName", result.data?.name || ""],
         ["role", result.data?.role || ""],
+        ["userId", result.data?.id ? JSON.stringify(result.data.id) : ""],
         ["userToken", JSON.stringify(result.data?.id)],
       ]);
     } else {
