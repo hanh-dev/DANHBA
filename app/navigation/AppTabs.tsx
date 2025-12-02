@@ -137,7 +137,10 @@ const AppTabs = () => {
 
           if (
             routeName === "Profile" ||
-            routeName === "ProductByCategory"
+            routeName === "EditProfile" ||
+            routeName === "SignIn" ||
+            routeName === "Main" ||
+            routeName === "Admin"
           ) {
             return {
               tabBarStyle: { display: "none" },

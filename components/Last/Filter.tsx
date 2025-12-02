@@ -9,7 +9,7 @@ const Filter = () => {
   const navigation = useNavigation<NavigationProps>();
   return (
     <View style={styles.container}>
-      <View style={styles.topBar}>
+      <View>
         <Ionicons
           name="arrow-back"
           size={24}

@@ -187,7 +187,10 @@ export const updateUser = async (user: EditUserData): Promise<void> => {
 
 export const getUserById = async (id: number): Promise<User | null> => {
   const database = await dbConnection();
-  const results = await database.getAllAsync("SELECT * FROM users WHERE id = ?", [id]);
+  const results = await database.getAllAsync(
+    "SELECT * FROM users WHERE id = ?",
+    [id]
+  );
   if (results.length > 0) {
     const row = results[0] as any;
     return {
@@ -199,6 +202,19 @@ export const getUserById = async (id: number): Promise<User | null> => {
     };
   }
   return null;
+};
+
+export const updateUserInfo = async (user: User): Promise<boolean> => {
+  const database = await dbConnection();
+  try {
+    await database.runAsync(
+      "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?",
+      [user.name, user.email, user.password, user.id]
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 export const initCategories = async (): Promise<void> => {
@@ -435,7 +451,7 @@ export const getOrdersByUserId = async (userId: number): Promise<any[]> => {
     "SELECT * FROM orders_1 WHERE user_id = ?",
     [userId]
   );
-  let orders: any[] = []; 
+  let orders: any[] = [];
   for (const row of results as any[]) {
     orders.push({
       id: row.id,
@@ -450,21 +466,21 @@ export const getOrdersByUserId = async (userId: number): Promise<any[]> => {
 };
 
 // getUserId
- export const getUserId = async (): Promise<number | null> => {
-    try {
-      const userIdJson = await AsyncStorage.getItem("userId");
+export const getUserId = async (): Promise<number | null> => {
+  try {
+    const userIdJson = await AsyncStorage.getItem("userId");
 
-      if (userIdJson !== null) {
-        const userId = JSON.parse(userIdJson);
+    if (userIdJson !== null) {
+      const userId = JSON.parse(userIdJson);
 
-        return typeof userId === "number" ? userId : null;
-      }
-
-      return null;
-    } catch (error) {
-      console.error("Lỗi khi lấy User ID từ AsyncStorage:", error);
-      return null;
+      return typeof userId === "number" ? userId : null;
     }
-  };
+
+    return null;
+  } catch (error) {
+    console.error("Lỗi khi lấy User ID từ AsyncStorage:", error);
+    return null;
+  }
+};
 
 export default dbConnection;

@@ -39,9 +39,15 @@ const SignIn = () => {
         text2: "Sign in successful! 🎉",
       });
       if (result.data?.role === "admin") {
-        navigation.navigate("Admin");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Admin" }],
+        });
       } else {
-        navigation.navigate("Main");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Main" }],
+        });
       }
       await AsyncStorage.multiSet([
         ["userName", result.data?.name || ""],

@@ -21,7 +21,10 @@ const AdminHome = () => {
     await AsyncStorage.removeItem("userName");
     await AsyncStorage.removeItem("role");
 
-    navigation.navigate("SignIn");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "SignIn" }],
+    });
   };
 
   return (

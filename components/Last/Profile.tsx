@@ -12,7 +12,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { getUserById, User } from "../buoi12/database";
-import EditProfile from "./EditProfile";
 
 const Profile = () => {
   const [edit, setEdit] = useState(false);
@@ -40,16 +39,22 @@ const Profile = () => {
     {
       icon: "person-outline",
       label: "Edit Profile",
-      onPress: () => setEdit(true),
+      onPress: () => navigation.navigate("EditProfile", { userInfo }),
     },
     { icon: "shield-outline", label: "Security Settings" },
     { icon: "location-outline", label: "Messaging Addresses" },
     { icon: "key-outline", label: "Change Password" },
   ];
 
-  const handleLogout = () => {
-    console.log("Logout pressed");
-    // Add your logout logic here
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userToken");
+    await AsyncStorage.removeItem("userName");
+    await AsyncStorage.removeItem("role");
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "SignIn" }],
+    });
   };
 
   return (
@@ -70,39 +75,32 @@ const Profile = () => {
             source={require("../../assets/grocery/hanh.jpg")}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{userInfo.name}</Text>
         </View>
         {/* Info Section */}
-        {edit ? (
-          <EditProfile />
-        ) : (
-          <View style={styles.infoContainer}>
-            {menuItems.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.menuItem}
-                onPress={item.onPress}
-              >
-                <View style={styles.menuItemContent}>
-                  <View style={styles.iconCircle}>
-                    <Ionicons
-                      name={item.icon as any}
-                      size={20}
-                      color="#1A9B89"
-                    />
-                  </View>
-                  <Text style={styles.menuLabel}>{item.label}</Text>
+        <View style={styles.infoContainer}>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.menuItem}
+              onPress={item.onPress}
+            >
+              <View style={styles.menuItemContent}>
+                <View style={styles.iconCircle}>
+                  <Ionicons name={item.icon as any} size={20} color="#1A9B89" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#999" />
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+                <Text style={styles.menuLabel}>{item.label}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+          ))}
+        </View>
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+        {!edit && (
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );

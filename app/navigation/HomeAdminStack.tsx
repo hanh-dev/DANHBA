@@ -10,6 +10,7 @@ import UserManagement from "@/components/Last/admin/UserManagement";
 import CategoryManagement from "@/components/Last/admin/CategoryManagement";
 import ProductManagement from "@/components/Last/admin/ProductManagement";
 import Home from "@/components/Last/admin/Home";
+import SignIn from "@/components/Last/SignIn";
 
 const Stack = createNativeStackNavigator<HomeAdminStackParamList>();
 
@@ -20,6 +21,7 @@ const HomeAdminStack = () => {
       <Stack.Screen name="UserManagement" component={UserManagement} />
       <Stack.Screen name="CategoryManagement" component={CategoryManagement} />
       <Stack.Screen name="ProductManagement" component={ProductManagement} />
+      <Stack.Screen name="SignIn" component={SignIn} />
     </Stack.Navigator>
   );
 };

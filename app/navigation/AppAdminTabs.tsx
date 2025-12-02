@@ -81,7 +81,9 @@ const AppAdminTabs = () => {
             routeName === "ProductsByCategory" ||
             routeName === "ProductManagement" ||
             routeName === "CategoryManagement" ||
-            routeName === "Filter"
+            routeName === "Filter" ||
+            routeName === "Profile" ||
+            routeName === "SignIn"
           ) {
             return {
               tabBarStyle: { display: "none" },

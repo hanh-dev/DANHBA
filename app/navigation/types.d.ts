@@ -1,4 +1,4 @@
-import { Category, Product } from "@/components/buoi12/database";
+import { Category, Product, User } from "@/components/buoi12/database";
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -19,13 +19,19 @@ export type HomeAdminStackParamList = {
   UserManagement: undefined;
   CategoryManagement: undefined;
   ProductManagement: undefined;
+  SignIn: undefined;
 };
 
 export type ProfileStackParamList = {
   BMI: undefined;
   ProductDetail: { product: Product };
-  Profile: undefined
-  EditProfile: undefined;
+  Profile: undefined;
+  EditProfile: {
+    user: User;
+  };
+  SignIn: undefined;
+  Main: undefined;
+  Admin: undefined;
 };
 
 export type BottomTabParamList = {
@@ -49,9 +55,9 @@ export type ProductDetailParamList = {
 
 export type ProductByCategoryParamList = {
   Category: undefined;
-  ProductByCategory: {id: number},
-  ProductDetail: {product: Product}
-}
+  ProductByCategory: { id: number };
+  ProductDetail: { product: Product };
+};
 
 export type AuthStackParamList = {
   SignIn: undefined;
