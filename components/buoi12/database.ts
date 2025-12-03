@@ -5,7 +5,7 @@ let db: SQLite.SQLiteDatabase | null = null;
 const dbConnection = async (): Promise<SQLite.SQLiteDatabase> => {
   if (db) return db;
   // User table
-  db = await SQLite.openDatabaseAsync("groceryStore.db");
+  db = await SQLite.openDatabaseAsync("store.db");
   const createUserTableQuery = `CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -31,18 +31,27 @@ const dbConnection = async (): Promise<SQLite.SQLiteDatabase> => {
     FOREIGN KEY (categoryId) REFERENCES categories (id)
   )`;
   await db.execAsync(createProductsTableQuery);
-  // Orders table
-  const createOrdersTableQuery = `CREATE TABLE IF NOT EXISTS orders_1 (
+  // Order
+  const createOrdersTableQuery = `CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
     order_date TEXT NOT NULL,
     total_amount REAL NOT NULL,
     status TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (product_id) REFERENCES products (id)
+    FOREIGN KEY (user_id) REFERENCES users (id)
   )`;
   await db.execAsync(createOrdersTableQuery);
+  // Order Detail
+  const createOrdersDetailQuery = `CREATE TABLE IF NOT EXISTS order_details (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    price INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id),
+    FOREIGN KEY (product_id) REFERENCES products (id)
+  )`;
+  await db.execAsync(createOrdersDetailQuery);
   return db;
 };
 
@@ -219,8 +228,6 @@ export const updateUserInfo = async (user: User): Promise<boolean> => {
 
 export const initCategories = async (): Promise<void> => {
   const database = await dbConnection();
-  await database.execAsync("ALTER TABLE categories ADD COLUMN img TEXT");
-
   for (const category of categoriesData) {
     await database.execAsync(
       `INSERT INTO categories (id, name, img) VALUES ('${category.id}', '${category.name}', '${category.img}');`
@@ -244,9 +251,9 @@ export const initProducts = async (): Promise<void> => {
 };
 
 export const initSampleData = async () => {
-  // await initCategories();
-  // await initProducts();
-  // await initUsers();
+  await initUsers();
+  await initCategories();
+  await initProducts();
 };
 
 export const addCategory = async (category: Category) => {
@@ -423,48 +430,164 @@ export const getAllUsers = async (): Promise<User[]> => {
   return users;
 };
 
-export type Order = {
-  user_id: number;
-  status: string;
-  order_date: string;
-  total_amount: number;
+export type OrderItem = {
   product_id: number;
+  quantity: number;
+  price: number;
 };
 
-export const addOrder = async (order: Order) => {
+export type NewOrder = {
+  user_id: number;
+  items: OrderItem[];
+  status: string;
+};
+export const addOrder = async (
+  newOrder: NewOrder
+): Promise<{ status: boolean; orderId?: number }> => {
   const database = await dbConnection();
-  await database.runAsync(
-    "INSERT INTO orders_1 (user_id, product_id, order_date, total_amount, status) VALUES (?, ?, ?, ?, ?)",
-    [
-      order.user_id,
-      order.product_id,
-      order.order_date,
-      order.total_amount,
-      order.status,
-    ]
+  console.log("Check data: ", newOrder);
+  let orderId: number | undefined;
+
+  const totalAmount = newOrder.items.reduce(
+    (sum, item) => sum + item.quantity * item.price,
+    0
   );
+
+  const orderDate = new Date().toISOString();
+
+  try {
+    const result = await database.runAsync(
+      `INSERT INTO orders (user_id, order_date, total_amount, status) VALUES (?, ?, ?, ?)`,
+      [newOrder.user_id, orderDate, totalAmount, newOrder.status]
+    );
+
+    orderId = result.lastInsertRowId;
+
+    for (const item of newOrder.items) {
+      await database.runAsync(
+        `INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)`,
+        [orderId, item.product_id, item.quantity, item.price]
+      );
+    }
+
+    console.log(
+      `✅ Order ${orderId} added with ${newOrder.items.length} items.`
+    );
+    return { status: true, orderId };
+  } catch (error) {
+    console.error("❌ Lỗi khi thêm đơn hàng:", error);
+    return { status: false };
+  }
+};
+
+export const updateOrderStatus = async (
+  orderId: number,
+  newStatus: string
+): Promise<boolean> => {
+  try {
+    const database = await dbConnection();
+    await database.runAsync("UPDATE orders SET status = ? WHERE id = ?", [
+      newStatus,
+      orderId,
+    ]);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const groupOrderData = (rawResults: any[]) => {
+  const ordersMap = new Map();
+
+  rawResults.forEach((row) => {
+    const orderId = row.order_id;
+
+    if (!ordersMap.has(orderId)) {
+      ordersMap.set(orderId, {
+        id: row.order_id,
+        user_id: row.user_id,
+        order_date: row.order_date,
+        total_amount: row.total_amount,
+        status: row.status,
+        items: [],
+      });
+    }
+
+    if (row.product_id) {
+      ordersMap.get(orderId).items.push({
+        product_id: row.product_id,
+        product_name: row.product_name,
+        quantity: row.quantity,
+        price: row.price,
+      });
+    }
+  });
+
+  return Array.from(ordersMap.values());
+};
+
+export const getOrders = async (): Promise<any[]> => {
+  const database = await dbConnection();
+  const query = `
+        SELECT
+            o.id AS order_id,
+            o.user_id,
+            o.order_date,
+            o.total_amount,
+            o.status,
+            od.product_id,
+            od.quantity,
+            od.price,
+            p.name AS product_name
+        FROM
+            orders o
+        LEFT JOIN
+            order_details od ON o.id = od.order_id
+        LEFT JOIN
+            products p ON od.product_id = p.id
+        ORDER BY
+            o.order_date DESC;
+    `;
+  const results = await database.getAllAsync(query);
+  return groupOrderData(results);
 };
 
 export const getOrdersByUserId = async (userId: number): Promise<any[]> => {
   const database = await dbConnection();
-  const results = await database.getAllAsync(
-    "SELECT * FROM orders_1 WHERE user_id = ?",
-    [userId]
-  );
-  let orders: any[] = [];
-  for (const row of results as any[]) {
-    orders.push({
-      id: row.id,
-      user_id: row.user_id,
-      product_id: row.product_id,
-      order_date: row.order_date,
-      total_amount: row.total_amount,
-      status: row.status,
-    });
-  }
-  return orders;
+  const query = `
+        SELECT
+            o.id AS order_id,
+            o.user_id,
+            o.order_date,
+            o.total_amount,
+            o.status,
+            od.product_id,
+            od.quantity,
+            od.price,
+            p.name AS product_name
+        FROM
+            orders o
+        LEFT JOIN
+            order_details od ON o.id = od.order_id
+        LEFT JOIN
+            products p ON od.product_id = p.id
+        WHERE
+            o.user_id = ?
+        ORDER BY
+            o.order_date DESC;
+    `;
+  const results = await database.getAllAsync(query, [userId]);
+  return groupOrderData(results);
 };
-
+export const deleteOrder = async (orderId: number): Promise<boolean> => {
+  const database = await dbConnection();
+  try {
+    await database.runAsync("DELETE FROM orders where id = ?", [orderId]);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 // getUserId
 export const getUserId = async (): Promise<number | null> => {
   try {

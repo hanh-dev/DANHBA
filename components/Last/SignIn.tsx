@@ -17,7 +17,7 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { signIn } from "../buoi12/database";
+import { getAllUsers, signIn } from "../buoi12/database";
 
 type NavigationProps = NativeStackNavigationProp<AuthStackParamList, "SignIn">;
 
@@ -31,6 +31,8 @@ const SignIn = () => {
   const passwordRef = useRef<TextInput>(null);
   const handleSignIn = async () => {
     const result = await signIn({ email: email, password: password });
+    const users = await getAllUsers();
+    console.log("Test users: ", users);
     console.log("Test login result: ", result);
     if (result.status) {
       Toast.show({
@@ -87,7 +89,7 @@ const SignIn = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Ionicons name="arrow-back" size={24} color="#4CAF50" />
           </TouchableOpacity>
           <Text style={styles.welcomeTitle}>Welcome back</Text>
           <Text style={styles.welcomeSubtitle}>
@@ -159,12 +161,12 @@ const SignIn = () => {
           <Text style={styles.dividerText}>Or continue with</Text>
 
           <TouchableOpacity style={styles.socialButton}>
-            <Ionicons name="logo-google" size={20} color="#000" />
+            <Ionicons name="logo-google" size={20} color="#4CAF50" />
             <Text style={styles.socialButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialButton}>
-            <Ionicons name="logo-apple" size={24} color="#000" />
+            <Ionicons name="logo-apple" size={24} color="#4CAF50" />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
+    color: "#4CAF50",
     marginTop: 30,
     marginBottom: 10,
   },
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
 
   // Sign In Button
   signInButton: {
-    backgroundColor: "#0F284B",
+    backgroundColor: "#4CAF50",
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
@@ -310,7 +312,7 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000",
+    color: "#4CAF50",
     marginLeft: 10,
   },
 
@@ -324,7 +326,7 @@ const styles = StyleSheet.create({
     color: "#A0A0A0",
   },
   signUpLink: {
-    color: "#000",
+    color: "#4CAF50",
     fontWeight: "bold",
   },
 });

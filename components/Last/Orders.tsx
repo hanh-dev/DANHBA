@@ -10,10 +10,7 @@ import {
 } from "react-native";
 import { getOrdersByUserId } from "../buoi12/database";
 
-// ===================================
-// Render Row Item
-// ===================================
-const renderOrderItem = ({ order }: { order: any }) => {
+export const renderOrderItem = ({ order }: { order: any }) => {
   const formatOrderDate = (dateString: string) => {
     const date = new Date(dateString);
     return (
@@ -71,10 +68,6 @@ const renderOrderItem = ({ order }: { order: any }) => {
     </TouchableOpacity>
   );
 };
-
-// ===================================
-// Main Component
-// ===================================
 
 const Orders = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -183,6 +176,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#658C58",
   },
-  // Bạn có thể giữ các styles không liên quan (như modal, input) ở đây,
-  // nhưng chúng không được sử dụng trong component Orders này.
 });

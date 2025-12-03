@@ -54,6 +54,7 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
   const fetchData = async () => {
     try {
       const rawCategories: Category[] = await getAllCategories();
+      console.log("test category: ", categories);
       const uiCategories = mapCategoryToUI(rawCategories);
       setCategories(uiCategories);
       const rawProducts: Product[] = await getAllProducts();

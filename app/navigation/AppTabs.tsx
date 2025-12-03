@@ -82,6 +82,7 @@ const AppTabs = () => {
           if (
             routeName === "ProductDetail" ||
             routeName === "ProductsByCategory" ||
+            // routeName === "Checkout" ||
             routeName === "Filter"
           ) {
             return {
