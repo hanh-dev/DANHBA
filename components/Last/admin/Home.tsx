@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     paddingHorizontal: 10,
     paddingBottom: 20,
-    marginBottom: 26
+    marginBottom: 26,
   },
   header: {
     flexDirection: "row",
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     paddingHorizontal: 15,
-    color: "#4CAF50"
+    color: "#4CAF50",
   },
   adminContainer: {
     padding: 16,
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginHorizontal: 15,
-    marginTop: 14
+    marginTop: 14,
   },
   itemContainer: {
     flexDirection: "row",

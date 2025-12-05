@@ -16,7 +16,7 @@ return (
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="SignIn" component={SignIn} />
-      <Stack.Screen name="Main" component={AppTabs} />
+      {/* <Stack.Screen name="Main" component={AppTabs} /> */}
       <Stack.Screen name="Admin" component={AppAdminTabs} />
     </Stack.Navigator>
   );

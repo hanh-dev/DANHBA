@@ -8,9 +8,12 @@ import CategoryList, { CategoryUI } from "../Last/CategoryList";
 import Header from "../Last/Header";
 import ProductCard from "../Last/ProductCard";
 import {
+  CartItem,
   Category,
   getAllCategories,
   getAllProducts,
+  getCartByUserId,
+  getUserId,
   Product,
 } from "./database";
 const CATEGORY_UI_MAP: { [key: string]: { icon: any; color: string } } = {
@@ -51,10 +54,10 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
   const [categories, setCategories] = useState<CategoryUI[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [keyword, setKeyword] = useState<string>("");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const fetchData = async () => {
     try {
       const rawCategories: Category[] = await getAllCategories();
-      console.log("test category: ", categories);
       const uiCategories = mapCategoryToUI(rawCategories);
       setCategories(uiCategories);
       const rawProducts: Product[] = await getAllProducts();
@@ -63,7 +66,6 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
       console.error("Error fetching product list: ", error);
     }
   };
-
   const handleSearch = async (text?: string, price?: [number, number]) => {
     console.log("Searching for: ", text, price);
     if (text && text.trim() !== "") {
@@ -84,9 +86,18 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
       );
     }
   };
+  const fetchCartItems = async () => {
+    const userId = await getUserId();
+    if (userId) {
+      const result = await getCartByUserId(userId);
+      console.log("Check cart: ", cartItems);
+      setCartItems(result);
+    }
+  };
 
   useEffect(() => {
     fetchData();
+    fetchCartItems();
   }, []);
 
   return (
@@ -96,6 +107,8 @@ const FinalProduct = ({ navigation }: HomeScreenProps) => {
           keyword={keyword}
           setKeyword={setKeyword}
           handleSearch={handleSearch}
+          onPress={() => navigation.navigate("Cart", { cartItems, categories })}
+          cartItems={cartItems}
         />
         <ScrollView
           showsVerticalScrollIndicator={false}

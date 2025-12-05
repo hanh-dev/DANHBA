@@ -1,4 +1,10 @@
-import { Category, Product, User } from "@/components/buoi12/database";
+import {
+  CartItem,
+  Category,
+  Product,
+  User,
+} from "@/components/buoi12/database";
+import { CategoryUI } from "@/components/Last/CategoryList";
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -11,7 +17,7 @@ export type HomeStackParamList = {
   CategorySelector: undefined;
   Filter: undefined;
   Checkout: undefined;
-  Cart: undefined;
+  Cart: { cartItems: CartItem[], categories: CategoryUI[]};
 };
 
 export type HomeAdminStackParamList = {

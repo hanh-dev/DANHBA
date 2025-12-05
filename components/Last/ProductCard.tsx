@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Product } from "../buoi12/database";
+import Toast from "react-native-toast-message";
+import { AddCart, addToCart, getUserId, Product } from "../buoi12/database";
 
 interface ProductCardProps {
   product: Product;
@@ -32,9 +32,31 @@ export const PRODUCT_IMAGES: { [key: string]: any } = {
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
-  const navigation: any = useNavigation();
-  const handleBuy = () => {
-    console.log(`Buying product: ${product.name}`);
+  const handleAddToCart = async (productId: number) => {
+    const userId = await getUserId();
+    const newItem: AddCart = {
+      user_id: userId || 4,
+      product_id: productId,
+      quantity: 1,
+    };
+
+    const result = await addToCart(newItem);
+
+    if (result) {
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Added to Cart successfully! 🎉",
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "error",
+        text2: "Failed add to Cart!",
+      });
+    }
+
+    console.log("Check adding product: ", productId);
   };
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
@@ -61,10 +83,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
 
       <TouchableOpacity
         style={styles.cartButton}
-        onPress={() => navigation.navigate("Checkout", { product })}
+        onPress={() => handleAddToCart(product.id)}
       >
-        <Ionicons name="bag-add-outline" size={20} color="#fff" />
-        <Text style={styles.cartButtonText}>Buy</Text>
+        <Ionicons name="bag-outline" size={22} color="#fff" />
+        <Text style={styles.cartButtonText}>Add To Cart</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -141,5 +163,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     marginLeft: 5,
+    fontSize: 14,
   },
 });

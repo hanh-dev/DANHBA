@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    bottom: -140
   },
   logoutText: {
     color: "#FFFFFF",

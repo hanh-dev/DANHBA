@@ -52,6 +52,16 @@ const dbConnection = async (): Promise<SQLite.SQLiteDatabase> => {
     FOREIGN KEY (product_id) REFERENCES products (id)
   )`;
   await db.execAsync(createOrdersDetailQuery);
+  // Cart items
+  const createCartItemQuery = `CREATE TABLE IF NOT EXISTS cart_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER not null,
+    product_id INTEGER not null,
+    quantity INTEGER not null,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (product_id) REFERENCES products (id)
+  )`;
+  await db.execAsync(createCartItemQuery);
   return db;
 };
 
@@ -588,6 +598,81 @@ export const deleteOrder = async (orderId: number): Promise<boolean> => {
     return false;
   }
 };
+
+// Cart-Features
+export type CartItem = {
+  productId: number,
+  categoryId: number;
+  productName: string;
+  productImage: string;
+  productPrice: number;
+  quantity: number;
+};
+export type AddCart = {
+  user_id: number;
+  product_id: number;
+  quantity: number;
+};
+// AddToCart
+export const addToCart = async (data: AddCart): Promise<boolean> => {
+  try {
+    const db = await dbConnection();
+    // Check existing products in user cart
+    const result = await db.getFirstAsync<{ id: number; quantity: number }>(
+      "select id, quantity from cart_items where user_id = ? and product_id = ?",
+      [data.user_id, data.product_id]
+    );
+
+    if (result) {
+      // If yes, update quantity
+      // Quantity total
+      const totalQuantity = (data.quantity + result.quantity) as number;
+      await db.runAsync(
+        "update cart_items set quantity = ? where product_id = ? and user_id = ?",
+        [totalQuantity, data.product_id, data.user_id]
+      );
+    } else {
+      // If no, add new to user's cart list
+      await db.runAsync(
+        "insert into cart_items(user_id, product_id, quantity) values(?, ?, ?)",
+        [data.user_id, data.product_id, data.quantity]
+      );
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+// GetCart
+export const getCartByUserId = async (userId: number): Promise<CartItem[]> => {
+  const db = await dbConnection();
+
+  const query = `select p.id as productId, p.categoryId, p.name as productName, p.price as productPrice, p.img as productImage, c.quantity from cart_items c join products p on c.product_id = p.id where c.user_id = ?`;
+  const results = await db.getAllAsync(query, [userId]);
+  let cartList: CartItem[] = [];
+
+  for (const row of results as any[]) {
+    cartList.push({
+      productId: row.productId,
+      categoryId: row.categoryId,
+      productName: row.productName,
+      productImage: row.productImage,
+      productPrice: row.productPrice,
+      quantity: row.quantity,
+    });
+  }
+  return cartList;
+};
+// UpdateCartQuantity
+// ClearCart
+export const clearUserCart = async (userId: number) => {
+  const db = await dbConnection();
+
+  // Query
+  const query = `delete from cart_items where user_id = ?`;
+  await db.runAsync(query, [userId]);
+};
+
 // getUserId
 export const getUserId = async (): Promise<number | null> => {
   try {

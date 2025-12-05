@@ -73,7 +73,6 @@ const EditProfile = () => {
           source={require("../../assets/grocery/hanh.jpg")}
           style={styles.profileImage}
         />
-        {/* <Text style={styles.userName}>{userInfo.name}</Text> */}
       </View>
       <View style={styles.screenContainer}>
         <View style={styles.inputWrapper}>
@@ -222,6 +221,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     marginBottom: 20,
+    bottom: -240
   },
   saveButtonText: {
     color: "#fff",

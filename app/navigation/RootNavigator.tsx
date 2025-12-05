@@ -95,7 +95,7 @@ const RootNavigator = () => {
             <Stack.Screen name="Admin" component={AppAdminTabs} />
             <Stack.Screen name="Main" component={AppTabsWrapper} />
           </>
-        ) : role === "buyer" ? (
+        ) : role === "buyer" || role === "Buyer" ? (
           <Stack.Screen name="Main" component={AppTabsWrapper} />
         ) : role === "admin" ? (
           <Stack.Screen name="Admin" component={AppAdminTabs} />

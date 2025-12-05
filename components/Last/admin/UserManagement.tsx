@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     elevation: 2,
+    marginHorizontal: 15
   },
 
   formContainer: {

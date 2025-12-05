@@ -83,6 +83,12 @@ const SignIn = () => {
       });
     }
   };
+  // useEffect(() => {
+  //   const initData = async() => {
+  //     await initUsers();
+  //   };
+  //   initData();
+  // }, [])
 
   return (
     <ScrollView>

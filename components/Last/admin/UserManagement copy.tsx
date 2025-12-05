@@ -73,7 +73,6 @@ const SwipeableUserItem = ({
   onDeleteUser: (id: number) => void;
 }) => {
   const handleDelete = () => {
-    // Xác nhận trước khi xóa
     Alert.alert(
       "Xác nhận xóa người dùng",
       `Bạn có chắc chắn muốn xóa ${user.name} không?`,
@@ -91,25 +90,18 @@ const SwipeableUserItem = ({
   return (
     <Swipeable
       rightButtons={rightButtons(handleDelete)}
-      rightButtonWidth={80} // Chiều rộng của nút xóa
+      rightButtonWidth={80}
       onRightActionActivate={() => {}}
       rightButtonContainerStyle={styles.swipeContainer}
-      // Áp dụng khoảng cách giữa các mục ở đây
       containerStyle={{ marginBottom: 10 }}
     >
       {children}
     </Swipeable>
   );
 };
-
-// ----------------------------------------------------
-// --- COMPONENT CHÍNH: USER MANAGEMENT ---
-// ----------------------------------------------------
 const UserManagement = () => {
-  // Quản lý danh sách người dùng bằng state
   const [users, setUsers] = useState(initialUsers);
 
-  // Hàm xóa người dùng khỏi state
   const handleDeleteUser = (idToDelete: number) => {
     setUsers((currentUsers) =>
       currentUsers.filter((user) => user.id !== idToDelete)
@@ -123,10 +115,9 @@ const UserManagement = () => {
           users.map((user) => (
             <SwipeableUserItem
               key={user.id}
-              user={user} // Truyền dữ liệu user vào
-              onDeleteUser={handleDeleteUser} // Truyền hàm xóa vào
+              user={user}
+              onDeleteUser={handleDeleteUser}
             >
-              {/* Truyền UserItem vào bên trong SwipeableWrapper */}
               <UserItem
                 name={user.name}
                 role={user.role}
@@ -163,9 +154,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 15,
-    // LOẠI BỎ marginBottom TẠI ĐÂY
-
-    // Bóng đổ (để nguyên)
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -173,7 +161,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // --- Style Avatar (Giữ nguyên) ---
   avatarPlaceholder: {
     width: 40,
     height: 40,
@@ -187,7 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  // --- Style Text (Giữ nguyên) ---
   textContainer: {
     flex: 1,
   },
@@ -205,13 +191,12 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
   },
 
-  // --- Style cho Swipeable (PHẦN KÉO) ---
   swipeContainer: {
     borderRadius: 12,
     overflow: "hidden",
   },
   deleteButton: {
-    backgroundColor: "#FF3B30", // Màu đỏ chuẩn cho thao tác xóa
+    backgroundColor: "#FF3B30",
     justifyContent: "center",
     alignItems: "center",
     width: 80,

@@ -10,18 +10,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { CartItem } from "../buoi12/database";
 import PriceFilter from "./PriceFilter";
 
 interface HeaderProps {
   keyword: string;
   setKeyword: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (text: string, priceRange?: [number, number]) => void;
+  onPress: () => void;
+  cartItems: CartItem[];
 }
 
 const Header: React.FC<HeaderProps> = ({
   keyword,
   setKeyword,
   handleSearch,
+  onPress,
+  cartItems,
 }) => {
   const [userName, setUserName] = useState<string | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -56,8 +61,20 @@ const Header: React.FC<HeaderProps> = ({
           <Text style={styles.textAddress}>Hi! {userName}, Ho Chi Minh</Text>
         </View>
         <View style={styles.rightHeader}>
-          <Ionicons name="cart-outline" size={20} color="#ffffff" />
-          <Ionicons name="notifications-outline" size={19} color="#ffffff" />
+          <Ionicons
+            name="bag-outline"
+            size={24}
+            color="#ffffff"
+            onPress={onPress}
+          />
+          <View style={styles.wrapp}>
+            <Ionicons name="notifications-outline" size={22} color="#ffffff" />
+            <View style={styles.badgeNumber}>
+              <Text style={{ color: "white", fontSize: 12 }}>
+                {cartItems.length}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -132,6 +149,20 @@ const styles = StyleSheet.create({
   image: { width: 32, height: 32, borderRadius: 50 },
   textAddress: { color: "#ffffff" },
   rightHeader: { flexDirection: "row", gap: 4 },
+  wrapp: {
+    position: "relative",
+  },
+  badgeNumber: {
+    position: "absolute",
+    width: 18,
+    height: 18,
+    backgroundColor: "red",
+    borderRadius: 50,
+    top: 0,
+    right: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   boxSearch: {
     flexDirection: "row",
     gap: 10,

@@ -4,7 +4,13 @@ import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { HomeStackParamList } from "../../app/navigation/types";
-import { Category, getAllCategories } from "../buoi12/database";
+import {
+  AddCart,
+  addToCart,
+  Category,
+  getAllCategories,
+  getUserId,
+} from "../buoi12/database";
 import { CategoryUI } from "./CategoryList";
 import { PRODUCT_IMAGES } from "./ProductCard";
 
@@ -62,6 +68,29 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
     }
     console.log("Add to wishlist", product.id);
   };
+
+  const handleAddToCart = async (productId: number) => {
+    const userId = await getUserId();
+    console.log("Check userId: ", userId);
+
+    const newCartItem: AddCart = {
+      user_id: userId || 4,
+      product_id: productId,
+      quantity: quantity,
+    };
+    console.log("Check cart item data: ", newCartItem);
+
+    try {
+      const result = await addToCart(newCartItem);
+      if (result) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Added to cart successfully! 🎉",
+        });
+      }
+    } catch (error) {}
+  };
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -83,7 +112,7 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
           color="#4CAF50"
           onPress={() => navigation.goBack()}
         />
-        <Ionicons name="cart-outline" size={24} color="#4CAF50" />
+        <Ionicons name="bag-outline" size={24} color="#4CAF50" />
       </View>
 
       {/* Product Image */}
@@ -138,17 +167,38 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
       </View>
 
       {/* Description */}
-      <Text style={styles.sectionTitle}>About the product</Text>
-      <Text style={styles.descriptionText}>
-        Cabbage is a leafy green, red, or white biennial plant grown as an
-        annual vegetable crop for its dense-leaved heads. It is descended...
-      </Text>
+      <View style={{ paddingHorizontal: 20}}>
+        <Text style={styles.sectionTitle}>About the product</Text>
+        <Text style={styles.descriptionText}>
+          Cabbage is a leafy green, red, or white biennial plant grown as an
+          annual vegetable crop for its dense-leaved heads. It is descended...
+        </Text>
+      </View>
 
       {/* Button */}
-      <TouchableOpacity style={styles.addToCartBtn}>
-        <Ionicons name="cart-outline" size={22} color="#fff" />
-        <Text style={styles.addToCartText}>Add to Cart</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          backgroundColor: "#fff",
+          borderWidth: 1,
+          borderColor: "#F1E2E2",
+          padding: 10,
+          marginTop: 54
+        }}
+      >
+        <View>
+          <Text style={{opacity: 0.5}}>Total Price</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold", color: "red"}}>${product.price * quantity}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.addToCartBtn}
+          onPress={() => handleAddToCart(product.id)}
+        >
+          <Ionicons name="bag-outline" size={22} color="#fff" />
+          <Text style={styles.addToCartText}>Add to Cart</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -156,7 +206,6 @@ const ProductDetail = ({ route, navigation }: ProductDetailProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
     backgroundColor: "#ffffff",
     paddingBottom: 20,
   },
@@ -165,6 +214,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 40,
+    paddingHorizontal: 20,
     marginBottom: 15,
   },
 
@@ -191,6 +241,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginBottom: 15,
+    paddingHorizontal: 20,
   },
 
   productName: {
@@ -258,14 +309,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 14,
-    borderRadius: 30,
+    borderRadius: 5,
     gap: 10,
     marginTop: "auto",
+    width: 180,
   },
 
   addToCartText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
   },
 });

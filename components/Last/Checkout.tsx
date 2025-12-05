@@ -40,6 +40,7 @@ export default function Checkout() {
     });
 
     const data = await res.json();
+    console.log("Check data: ", data);
 
     if (data.error) {
       console.error("Payment Intent creation failed:", data.error.message);
